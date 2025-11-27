@@ -7,23 +7,26 @@ const steps = [
 	{
 		title: "02. Receive your risk profile",
 		description:
-			"We map your answers into personas such as Conservative, Balanced, or Aggresive with reasoning.",
+			"We score your answers based on rules from experts and mapped it into personas such as Conservative, Moderate, or Aggressive with reasoning.",
 	},
 	{
-		title: "03. Receive your portfolio allocation",
+		title: "03. Receive your allocation recommendation",
 		description:
 			"Based on your risk profile, we provide portfolio allocation recommendation based on modern portfolio theory.",
 	},
 	{
-		title: "04. Ask our AI copilot",
+		title: "04. Ask our AI Chatbot",
 		description:
-			"Learn more about investment using our AI copilot, powered by NtepAI and ChowAI.",
+			"Learn more about investment and your risk profile using our AI Chatbot. It's available 24/7 to help you understand investing better.",
 	},
 ];
 
 export default function HowItWorksSection() {
 	return (
-		<section id="how-it-works" className="bg-slate-950 py-20">
+		<section
+			id="how-it-works"
+			className="bg-gradient-to-b from-black to-slate-950 py-20"
+		>
 			<div className="container space-y-8">
 				<div className="max-w-2xl">
 					<p className="text-sm uppercase tracking-[0.3em] text-primary-200">

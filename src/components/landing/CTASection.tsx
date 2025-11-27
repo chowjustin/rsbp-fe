@@ -6,7 +6,7 @@ type CTASectionProps = {
 
 export default function CTASection({ questionnaireHref }: CTASectionProps) {
 	return (
-		<section id="cta" className="bg-black py-20">
+		<section id="cta" className="bg-slate-950 pb-20">
 			<div className="container">
 				<div className="relative overflow-hidden rounded-3xl border border-primary-500/40 bg-gradient-to-r from-primary-600 to-secondary-500 px-8 py-12 text-white shadow-2xl">
 					<div className="absolute inset-y-0 right-0 hidden w-1/2 rounded-l-[48px] bg-white/10 lg:block" />

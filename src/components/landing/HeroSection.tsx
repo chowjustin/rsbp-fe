@@ -2,9 +2,8 @@ import Link from "next/link";
 import Button from "../button/Button";
 
 const stats = [
-	{ label: "Accuracy rating", value: "95%" },
-	{ label: "Avg. process time", value: "3 min" },
-	{ label: "Always ready to help", value: "24/7" },
+	{ label: "Assessment Duration", value: "2-5 min" },
+	{ label: "Always available", value: "24/7" },
 ];
 
 const insights = [
@@ -26,36 +25,37 @@ export default function HeroSection({
 		<section className="relative isolate overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-black">
 			<div className="pointer-events-none absolute inset-0 -z-10 opacity-40">
 				<div className="absolute -left-16 top-10 h-64 w-64 rounded-full bg-primary-500 blur-3xl" />
-				<div className="absolute bottom-0 right-0 h-64 w-64 rounded-full bg-secondary-400 blur-3xl" />
+				<div className="absolute bottom-16 right-0 h-64 w-64 rounded-full bg-secondary-400 blur-3xl" />
 			</div>
 			<div className="container grid gap-12 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-28">
 				<div>
 					<p className="text-sm uppercase tracking-[0.3em] text-primary-200">
-						AI ROBO ADVISOR
+						ROBO ADVISOR
 					</p>
 					<h1 className="mt-4 text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
-						Analyze risk profile to build your portfolio.
+						Find out your risk profile and recommendation by the experts.
 					</h1>
 					<p className="mt-6 text-lg text-slate-200">
-						Answer the questionnaire, receive your risk profile, and get a
-						portfolio allocation based on expert system. Our AI Copilot can also
-						help you understand more about investment.
+						Answer a questionnaire consisting of 13 questions, then get a risk
+						profile and recommended mutual fund allocation based on experts. Our
+						AI chatbot can also help you better understand investing and your
+						risk profile.
 					</p>
 					<div className="mt-8 flex flex-wrap gap-4">
 						<Link
 							href={questionnaireHref}
 							className="inline-flex items-center justify-center rounded-full bg-primary-500 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-primary-500/40 transition hover:bg-primary-400"
 						>
-							Start questionnaire
+							Start Questionnaire
 						</Link>
 						<Button
 							onClick={onOpenChat}
 							className="inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-3 text-base font-semibold text-white transition hover:border-white hover:bg-white/10"
 						>
-							Chat with AI Copilot
+							AI Chatbot
 						</Button>
 					</div>
-					<div className="mt-10 grid gap-6 sm:grid-cols-3">
+					<div className="mt-10 grid gap-6 sm:grid-cols-2">
 						{stats.map((stat) => (
 							<div
 								key={stat.label}
