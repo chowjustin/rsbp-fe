@@ -9,9 +9,9 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const siteConfig = {
-	title: "Next Template",
+	title: "Robo Advisor",
 	description:
-		"A Next.js 15 starter template with TypeScript, Tailwind CSS v4, and built-in tools for efficient development.",
+		"An investment expert system that helps you know your risk profile and receive recommended portfolio allocations.",
 	url: process.env.SITE_URL || "https://example.com",
 };
 
