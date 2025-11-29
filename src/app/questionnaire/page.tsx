@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import Button from "@/components/button/Button";
+import ChatbotWidget from "@/components/chat/ChatbotWidget";
 import RadioButton from "@/components/form/RadioButton";
 import clsxm from "@/lib/clsxm";
 import { questionsData } from "./_constants/question";
@@ -138,6 +139,7 @@ export default function QuestionnairePage() {
 					</FormProvider>
 				)}
 			</div>
+			<ChatbotWidget />
 		</main>
 	);
 }

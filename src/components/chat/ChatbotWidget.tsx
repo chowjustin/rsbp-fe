@@ -1,49 +1,30 @@
 "use client";
 
-import { X } from "lucide-react";
-import { type FormEvent, useMemo, useState } from "react";
+import { Loader, X } from "lucide-react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import useChatStore, { type Message } from "@/app/stores/useChatStore";
+import { chatWithBot } from "@/lib/chatbot";
 import Button from "../button/Button";
 
-type ChatbotWidgetProps = {
-	isOpen: boolean;
-	onOpen: () => void;
-	onClose: () => void;
-};
+export default function ChatbotWidget() {
+	const isOpen = useChatStore.useIsOpen();
+	const messages = useChatStore.useMessages();
+	const isThinking = useChatStore.useIsThinking();
 
-type Message = {
-	id: string;
-	role: "user" | "assistant";
-	content: string;
-};
+	const setIsOpen = useChatStore.useSetIsOpen();
+	const addMessage = useChatStore.useAddMessage();
+	const setIsThinking = useChatStore.useSetIsThinking();
+	const clearConversation = useChatStore.useClearConversation();
 
-const initialMessages: Message[] = [
-	{
-		id: "intro",
-		role: "assistant",
-		content:
-			"Hi! I am your Robo Advisor. Tell me about your financial goals, liquidity needs, or anything investing related.",
-	},
-	{
-		id: "user-1",
-		role: "user",
-		content: "What should I do with a bonus I just received?",
-	},
-	{
-		id: "assistant-1",
-		role: "assistant",
-		content:
-			"Congrats! Based on your Balanced profile, consider adding 60% to your core ETF stack, 20% to income sleeve, and keep 20% in cash for upcoming expenses.",
-	},
-];
-
-export default function ChatbotWidget({
-	isOpen,
-	onOpen,
-	onClose,
-}: ChatbotWidgetProps) {
-	const [messages, setMessages] = useState<Message[]>(initialMessages);
 	const [input, setInput] = useState("");
-	const [isThinking, setIsThinking] = useState(false);
+	const chatWindowRef = useRef<HTMLDivElement>(null);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Scroll to bottom when messages change
+	useEffect(() => {
+		if (chatWindowRef.current) {
+			chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+		}
+	}, [messages.length, isThinking]);
 
 	const placeholder = useMemo(
 		() =>
@@ -52,39 +33,51 @@ export default function ChatbotWidget({
 	);
 
 	const handleLauncherClick = () => {
-		if (isOpen) {
-			onClose();
-			return;
-		}
-		onOpen();
+		setIsOpen(!isOpen);
 	};
 
-	const handleSend = (event: FormEvent<HTMLFormElement>) => {
+	const handleClose = () => setIsOpen(false);
+
+	const handleSend = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		if (!input.trim()) return;
+		const userQuery = input.trim();
+		if (!userQuery) return;
 
-		const newMessage: Message = {
-			id: `${Date.now()}`,
-			role: "user",
-			content: input.trim(),
-		};
-
-		setMessages((prev) => [...prev, newMessage]);
+		addMessage({ role: "user", content: userQuery });
 		setInput("");
 		setIsThinking(true);
 
-		setTimeout(() => {
-			setMessages((prev) => [
-				...prev,
-				{
-					id: `${Date.now()}-assistant`,
-					role: "assistant",
-					content:
-						"Here's a diversified idea: maintain your emergency fund, direct the remainder into the recommended allocation, and set an automation so we can monitor drift for you.",
-				},
-			]);
+		try {
+			const response = await chatWithBot({ query: userQuery });
+
+			addMessage({
+				role: "assistant",
+				content: response.answer,
+				sources: response.sources,
+			});
+		} catch (error) {
+			console.error("Chatbot API Error:", error);
+			addMessage({
+				role: "assistant",
+				content:
+					"Maaf, terjadi kesalahan saat menghubungi asisten AI. Mohon coba lagi.",
+			});
+		} finally {
 			setIsThinking(false);
-		}, 900);
+		}
+	};
+
+	const renderMessageContent = (message: Message) => {
+		return (
+			<>
+				{message.content}
+				{message.sources && message.sources.length > 0 && (
+					<p className="mt-2 text-xs text-slate-500/70 italic">
+						Sources: {message.sources.join(", ")}
+					</p>
+				)}
+			</>
+		);
 	};
 
 	return (
@@ -112,14 +105,18 @@ export default function ChatbotWidget({
 								</p>
 							</div>
 							<Button
-								onClick={onClose}
+								onClick={handleClose}
 								className="rounded-full border border-slate-200 p-2 text-slate-500 transition bg-white hover:bg-gray-100 active:bg-gray-100 hover:text-slate-900"
 								aria-label="Close chatbot"
 							>
 								<X className="w-4 h-4" />
 							</Button>
 						</header>
-						<div className="max-h-[420px] space-y-4 overflow-y-auto px-6 py-4">
+
+						<div
+							ref={chatWindowRef}
+							className="max-h-[420px] space-y-4 overflow-y-auto px-6 py-4"
+						>
 							{messages.map((message) => (
 								<div key={message.id} className="flex gap-3">
 									<div
@@ -129,17 +126,18 @@ export default function ChatbotWidget({
 												: "ml-auto bg-primary-500 text-white"
 										}`}
 									>
-										{message.content}
+										{renderMessageContent(message)}
 									</div>
 								</div>
 							))}
 							{isThinking && (
 								<div className="flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-500">
-									<span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" />
+									<Loader size={16} className="animate-spin" />
 									Thinking
 								</div>
 							)}
 						</div>
+
 						<form
 							onSubmit={handleSend}
 							className="border-t border-slate-100 px-6 py-4"
@@ -154,14 +152,26 @@ export default function ChatbotWidget({
 									value={input}
 									onChange={(event) => setInput(event.target.value)}
 									placeholder={placeholder}
+									disabled={isThinking}
 									className="flex-1 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-primary-500 focus:outline-none"
 								/>
 								<button
 									type="submit"
+									disabled={isThinking || !input.trim()}
 									className="rounded-2xl bg-primary-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-400"
 								>
 									Send
 								</button>
+							</div>
+							<div className="mt-2 text-right">
+								<Button
+									onClick={clearConversation}
+									size="sm"
+									variant="ghost"
+									className="text-xs text-red-500 hover:text-red-600"
+								>
+									Clear conversation
+								</Button>
 							</div>
 						</form>
 					</div>
